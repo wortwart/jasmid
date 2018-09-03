@@ -1,0 +1,24 @@
+{
+  "name": "jasmid",
+  "version": "1.0.0",
+  "description": "Simple MIDI audio library",
+  "main": "index.html",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wortwart/jasmid.git"
+  },
+  "keywords": [
+    "MIDI",
+    "audio"
+  ],
+  "author": "Matt Westcott (gasman)",
+  "contributors": ["Herbert Braun (wortwart"],
+  "license": "see file LICENSE",
+  "bugs": {
+    "url": "https://github.com/wortwart/jasmid/issues"
+  },
+  "homepage": "https://github.com/wortwart/jasmid#readme"
+}
