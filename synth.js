@@ -1,8 +1,13 @@
+/*
+synth.js
+*/
+import {sampleRate} from './audio.js';
+
 function SineGenerator(freq) {
 	var self = {'alive': true};
 	var period = sampleRate / freq;
 	var t = 0;
-	
+
 	self.generate = function(buf, offset, count) {
 		for (; count; count--) {
 			var phase = t / period;
@@ -12,7 +17,7 @@ function SineGenerator(freq) {
 			t++;
 		}
 	}
-	
+
 	return self;
 }
 
@@ -20,7 +25,7 @@ function SquareGenerator(freq, phase) {
 	var self = {'alive': true};
 	var period = sampleRate / freq;
 	var t = 0;
-	
+
 	self.generate = function(buf, offset, count) {
 		for (; count; count--) {
 			var result = ( (t / period) % 1 > phase ? 1 : -1);
@@ -29,7 +34,7 @@ function SquareGenerator(freq, phase) {
 			t++;
 		}
 	}
-	
+
 	return self;
 }
 
@@ -42,14 +47,14 @@ function ADSRGenerator(child, attackAmplitude, sustainAmplitude, attackTimeS, de
 	var endTime = null; /* not known yet */
 	var releaseRate = sustainAmplitude / (sampleRate * releaseTimeS);
 	var t = 0;
-	
+
 	self.noteOff = function() {
 		if (self.released) return;
 		releaseTime = t;
 		self.released = true;
 		endTime = releaseTime + sampleRate * releaseTimeS;
 	}
-	
+
 	self.generate = function(buf, offset, count) {
 		if (!self.alive) return;
 		var input = new Array(count * 2);
@@ -57,8 +62,8 @@ function ADSRGenerator(child, attackAmplitude, sustainAmplitude, attackTimeS, de
 			input[i] = 0;
 		}
 		child.generate(input, 0, count);
-		
-		childOffset = 0;
+
+		let childOffset = 0;
 		while(count) {
 			if (releaseTime != null) {
 				if (t < endTime) {
@@ -104,7 +109,7 @@ function ADSRGenerator(child, attackAmplitude, sustainAmplitude, attackTimeS, de
 			}
 		}
 	}
-	
+
 	return self;
 }
 
@@ -112,7 +117,7 @@ function midiToFrequency(note) {
 	return 440 * Math.pow(2, (note-69)/12);
 }
 
-PianoProgram = {
+export const PianoProgram = {
 	'attackAmplitude': 0.2,
 	'sustainAmplitude': 0.1,
 	'attackTime': 0.02,
@@ -128,7 +133,7 @@ PianoProgram = {
 	}
 }
 
-StringProgram = {
+export const StringProgram = {
 	'createNote': function(note, velocity) {
 		var frequency = midiToFrequency(note);
 		return ADSRGenerator(
@@ -139,7 +144,7 @@ StringProgram = {
 	}
 }
 
-PROGRAMS = {
+export const PROGRAMS = {
 	41: StringProgram,
 	42: StringProgram,
 	43: StringProgram,
@@ -151,20 +156,20 @@ PROGRAMS = {
 	50: StringProgram
 };
 
-function Synth(sampleRate) {
-	
+export function Synth(sampleRate) {
+
 	var generators = [];
-	
+
 	function addGenerator(generator) {
 		generators.push(generator);
 	}
-	
+
 	function generate(samples) {
 		var data = new Array(samples*2);
 		generateIntoBuffer(samples, data, 0);
 		return data;
 	}
-	
+
 	function generateIntoBuffer(samplesToGenerate, buffer, offset) {
 		for (var i = offset; i < offset + samplesToGenerate * 2; i++) {
 			buffer[i] = 0;
@@ -174,7 +179,7 @@ function Synth(sampleRate) {
 			if (!generators[i].alive) generators.splice(i, 1);
 		}
 	}
-	
+
 	return {
 		'sampleRate': sampleRate,
 		'addGenerator': addGenerator,

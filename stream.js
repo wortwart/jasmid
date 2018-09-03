@@ -1,13 +1,16 @@
-/* Wrapper for accessing strings through sequential reads */
-function Stream(str) {
+/*
+replayer.js
+// Wrapper for accessing strings through sequential reads
+*/
+export default function Stream(str) {
 	var position = 0;
-	
+
 	function read(length) {
 		var result = str.substr(position, length);
 		position += length;
 		return result;
 	}
-	
+
 	/* read a big-endian 32-bit integer */
 	function readInt32() {
 		var result = (
@@ -27,7 +30,7 @@ function Stream(str) {
 		position += 2;
 		return result;
 	}
-	
+
 	/* read an 8-bit integer */
 	function readInt8(signed) {
 		var result = str.charCodeAt(position);
@@ -35,11 +38,11 @@ function Stream(str) {
 		position += 1;
 		return result;
 	}
-	
+
 	function eof() {
 		return position >= str.length;
 	}
-	
+
 	/* read a MIDI-style variable-length integer
 		(big-endian value in groups of 7 bits,
 		with top bit set to signify that another byte follows)
@@ -57,7 +60,7 @@ function Stream(str) {
 			}
 		}
 	}
-	
+
 	return {
 		'eof': eof,
 		'read': read,
